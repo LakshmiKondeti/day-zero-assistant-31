@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -5,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { AlertTriangle, Clock, Mail, BookOpen, Wrench, FileText, Video, User, Mic, MicOff, Volume2 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import VoiceAssistant from '@/components/VoiceAssistant';
-import DashboardSummary from '@/components/DashboardSummary';
 import OutlookPopup from '@/components/popups/OutlookPopup';
 import TeamsPopup from '@/components/popups/TeamsPopup';
 import ServiceNowPopup from '@/components/popups/ServiceNowPopup';
@@ -144,6 +144,12 @@ const Index = () => {
           dashboardData={dashboardData}
           employeeName={employeeName}
           criticalCount={criticalCount}
+          onOutlookClick={() => setOutlookPopupOpen(true)}
+          onTeamsClick={() => setTeamsPopupOpen(true)}
+          onIncidentsClick={() => setIncidentsPopupOpen(true)}
+          onApprovalsClick={() => setApprovalsPopupOpen(true)}
+          onLearningClick={() => setLearningPopupOpen(true)}
+          onServiceNowClick={() => setServiceNowPopupOpen(true)}
         />
 
         {/* Quick Access Buttons */}
@@ -196,12 +202,6 @@ const Index = () => {
             <span className="text-xs">Learning</span>
           </Button>
         </div>
-
-        {/* Dashboard Summary */}
-        <DashboardSummary 
-          dashboardData={dashboardData}
-          criticalCount={criticalCount}
-        />
 
         {/* Service Popups */}
         <TeamsServicePopup 

@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Mic, MicOff, Volume2, VolumeX, MessageCircle, Send } from 'lucide-react';
+import { Mic, MicOff, Volume2, VolumeX, MessageCircle, Send, Mail, Video, AlertTriangle, Clock, FileText, BookOpen } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from '@/hooks/use-toast';
@@ -12,6 +12,12 @@ interface VoiceAssistantProps {
   dashboardData: any;
   employeeName: string;
   criticalCount: number;
+  onOutlookClick: () => void;
+  onTeamsClick: () => void;
+  onIncidentsClick: () => void;
+  onApprovalsClick: () => void;
+  onLearningClick: () => void;
+  onServiceNowClick: () => void;
 }
 
 interface Message {
@@ -21,7 +27,17 @@ interface Message {
   timestamp: Date;
 }
 
-const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ dashboardData, employeeName, criticalCount }) => {
+const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ 
+  dashboardData, 
+  employeeName, 
+  criticalCount,
+  onOutlookClick,
+  onTeamsClick,
+  onIncidentsClick,
+  onApprovalsClick,
+  onLearningClick,
+  onServiceNowClick
+}) => {
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -58,19 +74,11 @@ const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ dashboardData, employee
     // Initialize speech synthesis
     synthesis.current = window.speechSynthesis;
 
-    // Add initial greeting with comprehensive dashboard overview
-    const nextMeeting = dashboardData.teamseMeetings[0];
-    const approvalCount = dashboardData.approvalRequests.pending;
-    const mandatoryTraining = dashboardData.learning.filter((l: any) => l.mandatory && l.deadline === 'Today').length;
-    const urgentMails = dashboardData.outlookMails.urgent;
-    const totalMails = dashboardData.outlookMails.escalated.length;
-    const serviceNowTickets = dashboardData.serviceNowTickets.length;
-    const escalatedTickets = dashboardData.serviceNowTickets.filter((t: any) => t.escalated).length;
-
+    // Add initial greeting with service breakdown
     const initialMessage: Message = {
       id: Date.now().toString(),
       type: 'assistant',
-      content: `Hello ${employeeName}! I'm PAL, your Personal Assistant Lite. Here's your dashboard overview: Your next Teams meeting is "${nextMeeting.title}" at ${nextMeeting.time}. You have ${approvalCount} approval requests pending, ${mandatoryTraining} mandatory trainings due today, ${urgentMails} urgent emails with ${totalMails} total escalated messages, and ${serviceNowTickets} ServiceNow tickets with ${escalatedTickets} escalated ones. You have ${criticalCount} critical items requiring immediate attention. How can I assist you today?`,
+      content: `Hello ${employeeName}! I'm PAL, your Personal Assistant Lite. You have ${criticalCount} critical items requiring immediate attention. Click on the service buttons below to get detailed information about each service.`,
       timestamp: new Date()
     };
     setMessages([initialMessage]);
@@ -114,56 +122,38 @@ const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ dashboardData, employee
     const input = userInput.toLowerCase();
     
     if (input.includes('critical') || input.includes('urgent')) {
-      const criticalIncidents = dashboardData.incidents.filter((i: any) => i.severity === 'Critical').length;
-      const urgentMeetings = dashboardData.teamseMeetings.filter((m: any) => m.urgent).length;
-      const urgentApprovals = dashboardData.approvalRequests.urgent.length;
-      
-      return `You have ${criticalIncidents} critical incidents, ${urgentMeetings} urgent meetings, and ${urgentApprovals} urgent approvals requiring immediate attention.`;
+      return `You have ${criticalCount} critical items requiring immediate attention. Click on the service buttons below to see detailed information.`;
     }
     
     if (input.includes('meeting') || input.includes('teams')) {
       const nextMeeting = dashboardData.teamseMeetings[0];
-      return `Your next meeting is "${nextMeeting.title}" at ${nextMeeting.time} with ${nextMeeting.attendees} attendees in the ${nextMeeting.channel} channel.`;
+      return `Your next meeting is "${nextMeeting.title}" at ${nextMeeting.time} with ${nextMeeting.attendees} attendees.`;
     }
     
     if (input.includes('email') || input.includes('mail')) {
-      return `You have ${dashboardData.outlookMails.urgent} urgent emails, with ${dashboardData.outlookMails.escalated.length} escalated messages requiring immediate attention.`;
+      return `You have ${dashboardData.outlookMails.urgent} urgent emails requiring attention.`;
     }
     
     if (input.includes('approval')) {
-      return `You have ${dashboardData.approvalRequests.pending} pending approvals, with ${dashboardData.approvalRequests.urgent.length} urgent requests. The oldest request is ${dashboardData.approvalRequests.urgent[0]?.days} days old.`;
+      return `You have ${dashboardData.approvalRequests.pending} pending approvals with ${dashboardData.approvalRequests.urgent.length} urgent requests.`;
     }
     
     if (input.includes('incident')) {
       const criticalIncidents = dashboardData.incidents.filter((i: any) => i.severity === 'Critical');
-      if (criticalIncidents.length > 0) {
-        return `There are ${criticalIncidents.length} critical incidents. The most severe is "${criticalIncidents[0].title}" affecting ${criticalIncidents[0].impact}.`;
-      }
-      return `You have ${dashboardData.incidents.length} total incidents being tracked.`;
+      return `There are ${criticalIncidents.length} critical incidents requiring immediate attention.`;
     }
     
     if (input.includes('training') || input.includes('learning')) {
       const dueTodayCount = dashboardData.learning.filter((l: any) => l.deadline === 'Today').length;
-      return `You have ${dashboardData.learning.length} learning items, with ${dueTodayCount} mandatory courses due today.`;
+      return `You have ${dueTodayCount} mandatory courses due today.`;
     }
     
     if (input.includes('ticket') || input.includes('servicenow')) {
       const escalatedCount = dashboardData.serviceNowTickets.filter((t: any) => t.escalated).length;
-      return `You have ${dashboardData.serviceNowTickets.length} ServiceNow tickets, with ${escalatedCount} escalated tickets requiring attention.`;
+      return `You have ${escalatedCount} escalated ServiceNow tickets requiring attention.`;
     }
     
-    if (input.includes('overview') || input.includes('summary')) {
-      const nextMeeting = dashboardData.teamseMeetings[0];
-      const approvalCount = dashboardData.approvalRequests.pending;
-      const mandatoryTraining = dashboardData.learning.filter((l: any) => l.mandatory && l.deadline === 'Today').length;
-      const urgentMails = dashboardData.outlookMails.urgent;
-      const serviceNowTickets = dashboardData.serviceNowTickets.length;
-      const escalatedTickets = dashboardData.serviceNowTickets.filter((t: any) => t.escalated).length;
-      
-      return `Here's your complete dashboard overview: Next Teams meeting is "${nextMeeting.title}" at ${nextMeeting.time}. You have ${approvalCount} approval requests, ${mandatoryTraining} mandatory trainings due today, ${urgentMails} urgent emails, ${serviceNowTickets} ServiceNow tickets with ${escalatedTickets} escalated ones, and ${criticalCount} total critical items.`;
-    }
-    
-    return `I'm PAL, your Personal Assistant Lite. I can help you with information about your meetings, emails, approvals, incidents, training, and ServiceNow tickets. What would you like to know more about?`;
+    return `I'm PAL, your Personal Assistant Lite. Click on the service buttons below to get detailed information about your tasks.`;
   };
 
   const handleUserInput = (input: string) => {
@@ -253,12 +243,81 @@ const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ dashboardData, employee
           )}
         </div>
 
+        {/* Service Summary Buttons */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <Button 
+            onClick={onOutlookClick}
+            className="h-20 flex flex-col items-center justify-center bg-green-600 hover:bg-green-700 text-white"
+          >
+            <Mail className="w-5 h-5 mb-1" />
+            <span className="text-xs text-center">Outlook Mails</span>
+            <Badge variant="secondary" className="text-xs mt-1 bg-white text-green-600">
+              {dashboardData.outlookMails.urgent}
+            </Badge>
+          </Button>
+          
+          <Button 
+            onClick={onTeamsClick}
+            className="h-20 flex flex-col items-center justify-center bg-indigo-600 hover:bg-indigo-700 text-white"
+          >
+            <Video className="w-5 h-5 mb-1" />
+            <span className="text-xs text-center">Teams Meetings</span>
+            <Badge variant="secondary" className="text-xs mt-1 bg-white text-indigo-600">
+              {dashboardData.teamseMeetings.filter((m: any) => m.urgent).length}
+            </Badge>
+          </Button>
+          
+          <Button 
+            onClick={onIncidentsClick}
+            className="h-20 flex flex-col items-center justify-center bg-red-600 hover:bg-red-700 text-white"
+          >
+            <AlertTriangle className="w-5 h-5 mb-1" />
+            <span className="text-xs text-center">Critical Incidents</span>
+            <Badge variant="secondary" className="text-xs mt-1 bg-white text-red-600">
+              {dashboardData.incidents.filter((i: any) => i.severity === 'Critical').length}
+            </Badge>
+          </Button>
+          
+          <Button 
+            onClick={onApprovalsClick}
+            className="h-20 flex flex-col items-center justify-center bg-blue-600 hover:bg-blue-700 text-white"
+          >
+            <FileText className="w-5 h-5 mb-1" />
+            <span className="text-xs text-center">Approvals</span>
+            <Badge variant="secondary" className="text-xs mt-1 bg-white text-blue-600">
+              {dashboardData.approvalRequests.urgent.length}
+            </Badge>
+          </Button>
+          
+          <Button 
+            onClick={onLearningClick}
+            className="h-20 flex flex-col items-center justify-center bg-orange-600 hover:bg-orange-700 text-white"
+          >
+            <BookOpen className="w-5 h-5 mb-1" />
+            <span className="text-xs text-center">Learning</span>
+            <Badge variant="secondary" className="text-xs mt-1 bg-white text-orange-600">
+              {dashboardData.learning.filter((l: any) => l.mandatory && l.deadline === 'Today').length}
+            </Badge>
+          </Button>
+          
+          <Button 
+            onClick={onServiceNowClick}
+            className="h-20 flex flex-col items-center justify-center bg-purple-600 hover:bg-purple-700 text-white"
+          >
+            <Clock className="w-5 h-5 mb-1" />
+            <span className="text-xs text-center">ServiceNow</span>
+            <Badge variant="secondary" className="text-xs mt-1 bg-white text-purple-600">
+              {dashboardData.serviceNowTickets.filter((t: any) => t.escalated).length}
+            </Badge>
+          </Button>
+        </div>
+
         {/* Text Input */}
         <div className="flex space-x-2">
           <Input
             value={textInput}
             onChange={(e) => setTextInput(e.target.value)}
-            placeholder="Pal do you need to know anything?"
+            placeholder="Ask PAL about your services..."
             className="flex-1 border-red-300 focus:border-red-500 focus:ring-red-500"
             onKeyPress={(e) => e.key === 'Enter' && handleTextSubmit()}
           />
@@ -272,8 +331,8 @@ const VoiceAssistant: React.FC<VoiceAssistantProps> = ({ dashboardData, employee
           </Button>
         </div>
 
-        {/* Conversation History - Now Scrollable */}
-        <ScrollArea className="h-48 w-full rounded-md border-2 border-red-200 bg-gray-50 p-4">
+        {/* Conversation History */}
+        <ScrollArea className="h-32 w-full rounded-md border-2 border-red-200 bg-gray-50 p-4">
           <div className="space-y-3">
             {messages.map((message) => (
               <div
