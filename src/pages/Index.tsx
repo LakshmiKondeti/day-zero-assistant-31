@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -7,6 +6,12 @@ import { AlertTriangle, Clock, Mail, BookOpen, Wrench, FileText, Video, User, Mi
 import { toast } from '@/hooks/use-toast';
 import VoiceAssistant from '@/components/VoiceAssistant';
 import DashboardSummary from '@/components/DashboardSummary';
+import OutlookPopup from '@/components/popups/OutlookPopup';
+import TeamsPopup from '@/components/popups/TeamsPopup';
+import ServiceNowPopup from '@/components/popups/ServiceNowPopup';
+import IncidentsPopup from '@/components/popups/IncidentsPopup';
+import ApprovalsPopup from '@/components/popups/ApprovalsPopup';
+import LearningPopup from '@/components/popups/LearningPopup';
 
 interface DashboardData {
   approvalRequests: {
@@ -27,6 +32,15 @@ interface DashboardData {
 const Index = () => {
   const [employeeName] = useState("Alex Johnson");
   const [currentTime, setCurrentTime] = useState(new Date());
+  
+  // Popup states
+  const [outlookPopupOpen, setOutlookPopupOpen] = useState(false);
+  const [teamsPopupOpen, setTeamsPopupOpen] = useState(false);
+  const [serviceNowPopupOpen, setServiceNowPopupOpen] = useState(false);
+  const [incidentsPopupOpen, setIncidentsPopupOpen] = useState(false);
+  const [approvalsPopupOpen, setApprovalsPopupOpen] = useState(false);
+  const [learningPopupOpen, setLearningPopupOpen] = useState(false);
+
   const [dashboardData, setDashboardData] = useState<DashboardData>({
     approvalRequests: {
       pending: 7,
@@ -118,10 +132,98 @@ const Index = () => {
           criticalCount={criticalCount}
         />
 
+        {/* Quick Access Buttons */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+          <Button 
+            onClick={() => setOutlookPopupOpen(true)}
+            className="h-16 flex flex-col items-center justify-center bg-green-600 hover:bg-green-700"
+          >
+            <Mail className="w-5 h-5 mb-1" />
+            <span className="text-xs">Outlook</span>
+          </Button>
+          
+          <Button 
+            onClick={() => setTeamsPopupOpen(true)}
+            className="h-16 flex flex-col items-center justify-center bg-indigo-600 hover:bg-indigo-700"
+          >
+            <Video className="w-5 h-5 mb-1" />
+            <span className="text-xs">Teams</span>
+          </Button>
+          
+          <Button 
+            onClick={() => setServiceNowPopupOpen(true)}
+            className="h-16 flex flex-col items-center justify-center bg-purple-600 hover:bg-purple-700"
+          >
+            <Wrench className="w-5 h-5 mb-1" />
+            <span className="text-xs">ServiceNow</span>
+          </Button>
+          
+          <Button 
+            onClick={() => setIncidentsPopupOpen(true)}
+            className="h-16 flex flex-col items-center justify-center bg-red-600 hover:bg-red-700"
+          >
+            <AlertTriangle className="w-5 h-5 mb-1" />
+            <span className="text-xs">Incidents</span>
+          </Button>
+          
+          <Button 
+            onClick={() => setApprovalsPopupOpen(true)}
+            className="h-16 flex flex-col items-center justify-center bg-blue-600 hover:bg-blue-700"
+          >
+            <FileText className="w-5 h-5 mb-1" />
+            <span className="text-xs">Approvals</span>
+          </Button>
+          
+          <Button 
+            onClick={() => setLearningPopupOpen(true)}
+            className="h-16 flex flex-col items-center justify-center bg-orange-600 hover:bg-orange-700"
+          >
+            <BookOpen className="w-5 h-5 mb-1" />
+            <span className="text-xs">Learning</span>
+          </Button>
+        </div>
+
         {/* Dashboard Summary */}
         <DashboardSummary 
           dashboardData={dashboardData}
           criticalCount={criticalCount}
+        />
+
+        {/* Individual Popups */}
+        <OutlookPopup 
+          isOpen={outlookPopupOpen}
+          onClose={() => setOutlookPopupOpen(false)}
+          outlookData={dashboardData.outlookMails}
+        />
+        
+        <TeamsPopup 
+          isOpen={teamsPopupOpen}
+          onClose={() => setTeamsPopupOpen(false)}
+          teamsData={dashboardData.teamseMeetings}
+        />
+        
+        <ServiceNowPopup 
+          isOpen={serviceNowPopupOpen}
+          onClose={() => setServiceNowPopupOpen(false)}
+          serviceNowData={dashboardData.serviceNowTickets}
+        />
+        
+        <IncidentsPopup 
+          isOpen={incidentsPopupOpen}
+          onClose={() => setIncidentsPopupOpen(false)}
+          incidentsData={dashboardData.incidents}
+        />
+        
+        <ApprovalsPopup 
+          isOpen={approvalsPopupOpen}
+          onClose={() => setApprovalsPopupOpen(false)}
+          approvalsData={dashboardData.approvalRequests}
+        />
+        
+        <LearningPopup 
+          isOpen={learningPopupOpen}
+          onClose={() => setLearningPopupOpen(false)}
+          learningData={dashboardData.learning}
         />
 
         {/* Footer */}
