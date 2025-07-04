@@ -1,11 +1,18 @@
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { AlertTriangle, Clock, Mail, BookOpen, Wrench, FileText, Video, User, Mic, MicOff, Volume2 } from 'lucide-react';
+import { AlertTriangle, Mail, BookOpen, Wrench, FileText, Video, User } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
-import VoiceAssistant from '@/components/VoiceAssistant';
-import DashboardSummary from '@/components/DashboardSummary';
+
+// Voice Assistant Components
+import LoginVoiceGreeting from '@/components/voice/LoginVoiceGreeting';
+import TeamsVoiceAssistant from '@/components/voice/TeamsVoiceAssistant';
+import OutlookVoiceAssistant from '@/components/voice/OutlookVoiceAssistant';
+import IncidentsVoiceAssistant from '@/components/voice/IncidentsVoiceAssistant';
+import ApprovalsVoiceAssistant from '@/components/voice/ApprovalsVoiceAssistant';
+import LearningVoiceAssistant from '@/components/voice/LearningVoiceAssistant';
+import ServiceNowVoiceAssistant from '@/components/voice/ServiceNowVoiceAssistant';
+
+// Popup Components
 import OutlookPopup from '@/components/popups/OutlookPopup';
 import TeamsPopup from '@/components/popups/TeamsPopup';
 import ServiceNowPopup from '@/components/popups/ServiceNowPopup';
@@ -125,12 +132,49 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Voice Assistant Module */}
-        <VoiceAssistant 
-          dashboardData={dashboardData}
+        {/* Login Voice Greeting */}
+        <LoginVoiceGreeting 
           employeeName={employeeName}
+          dashboardData={dashboardData}
           criticalCount={criticalCount}
         />
+
+        {/* Individual Voice Assistants for Each Service */}
+        <div className="mb-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">PAL - Personal Assistant Lite (Service Assistants)</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <TeamsVoiceAssistant 
+              teamsData={dashboardData.teamseMeetings}
+              onOpenPopup={() => setTeamsPopupOpen(true)}
+            />
+            
+            <OutlookVoiceAssistant 
+              outlookData={dashboardData.outlookMails}
+              onOpenPopup={() => setOutlookPopupOpen(true)}
+            />
+            
+            <IncidentsVoiceAssistant 
+              incidentsData={dashboardData.incidents}
+              onOpenPopup={() => setIncidentsPopupOpen(true)}
+            />
+            
+            <ApprovalsVoiceAssistant 
+              approvalsData={dashboardData.approvalRequests}
+              onOpenPopup={() => setApprovalsPopupOpen(true)}
+            />
+            
+            <LearningVoiceAssistant 
+              learningData={dashboardData.learning}
+              onOpenPopup={() => setLearningPopupOpen(true)}
+            />
+            
+            <ServiceNowVoiceAssistant 
+              serviceNowData={dashboardData.serviceNowTickets}
+              onOpenPopup={() => setServiceNowPopupOpen(true)}
+            />
+          </div>
+        </div>
 
         {/* Quick Access Buttons */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
@@ -182,12 +226,6 @@ const Index = () => {
             <span className="text-xs">Learning</span>
           </Button>
         </div>
-
-        {/* Dashboard Summary */}
-        <DashboardSummary 
-          dashboardData={dashboardData}
-          criticalCount={criticalCount}
-        />
 
         {/* Individual Popups */}
         <OutlookPopup 
