@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -6,18 +5,13 @@ import { Button } from '@/components/ui/button';
 import { AlertTriangle, Clock, Mail, BookOpen, Wrench, FileText, Video, User, Mic, MicOff, Volume2 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import VoiceAssistant from '@/components/VoiceAssistant';
+import DashboardSummary from '@/components/DashboardSummary';
 import OutlookPopup from '@/components/popups/OutlookPopup';
 import TeamsPopup from '@/components/popups/TeamsPopup';
 import ServiceNowPopup from '@/components/popups/ServiceNowPopup';
 import IncidentsPopup from '@/components/popups/IncidentsPopup';
 import ApprovalsPopup from '@/components/popups/ApprovalsPopup';
 import LearningPopup from '@/components/popups/LearningPopup';
-import TeamsServicePopup from '@/components/popups/TeamsServicePopup';
-import OutlookServicePopup from '@/components/popups/OutlookServicePopup';
-import ServiceNowServicePopup from '@/components/popups/ServiceNowServicePopup';
-import IncidentsServicePopup from '@/components/popups/IncidentsServicePopup';
-import ApprovalsServicePopup from '@/components/popups/ApprovalsServicePopup';
-import LearningServicePopup from '@/components/popups/LearningServicePopup';
 
 interface DashboardData {
   approvalRequests: {
@@ -46,14 +40,6 @@ const Index = () => {
   const [incidentsPopupOpen, setIncidentsPopupOpen] = useState(false);
   const [approvalsPopupOpen, setApprovalsPopupOpen] = useState(false);
   const [learningPopupOpen, setLearningPopupOpen] = useState(false);
-
-  // Service popup states
-  const [teamsServicePopupOpen, setTeamsServicePopupOpen] = useState(false);
-  const [outlookServicePopupOpen, setOutlookServicePopupOpen] = useState(false);
-  const [serviceNowServicePopupOpen, setServiceNowServicePopupOpen] = useState(false);
-  const [incidentsServicePopupOpen, setIncidentsServicePopupOpen] = useState(false);
-  const [approvalsServicePopupOpen, setApprovalsServicePopupOpen] = useState(false);
-  const [learningServicePopupOpen, setLearningServicePopupOpen] = useState(false);
 
   const [dashboardData, setDashboardData] = useState<DashboardData>({
     approvalRequests: {
@@ -144,18 +130,12 @@ const Index = () => {
           dashboardData={dashboardData}
           employeeName={employeeName}
           criticalCount={criticalCount}
-          onOutlookClick={() => setOutlookPopupOpen(true)}
-          onTeamsClick={() => setTeamsPopupOpen(true)}
-          onIncidentsClick={() => setIncidentsPopupOpen(true)}
-          onApprovalsClick={() => setApprovalsPopupOpen(true)}
-          onLearningClick={() => setLearningPopupOpen(true)}
-          onServiceNowClick={() => setServiceNowPopupOpen(true)}
         />
 
         {/* Quick Access Buttons */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
           <Button 
-            onClick={() => setOutlookServicePopupOpen(true)}
+            onClick={() => setOutlookPopupOpen(true)}
             className="h-16 flex flex-col items-center justify-center bg-green-600 hover:bg-green-700"
           >
             <Mail className="w-5 h-5 mb-1" />
@@ -163,7 +143,7 @@ const Index = () => {
           </Button>
           
           <Button 
-            onClick={() => setTeamsServicePopupOpen(true)}
+            onClick={() => setTeamsPopupOpen(true)}
             className="h-16 flex flex-col items-center justify-center bg-indigo-600 hover:bg-indigo-700"
           >
             <Video className="w-5 h-5 mb-1" />
@@ -171,7 +151,7 @@ const Index = () => {
           </Button>
           
           <Button 
-            onClick={() => setServiceNowServicePopupOpen(true)}
+            onClick={() => setServiceNowPopupOpen(true)}
             className="h-16 flex flex-col items-center justify-center bg-purple-600 hover:bg-purple-700"
           >
             <Wrench className="w-5 h-5 mb-1" />
@@ -179,7 +159,7 @@ const Index = () => {
           </Button>
           
           <Button 
-            onClick={() => setIncidentsServicePopupOpen(true)}
+            onClick={() => setIncidentsPopupOpen(true)}
             className="h-16 flex flex-col items-center justify-center bg-red-600 hover:bg-red-700"
           >
             <AlertTriangle className="w-5 h-5 mb-1" />
@@ -187,7 +167,7 @@ const Index = () => {
           </Button>
           
           <Button 
-            onClick={() => setApprovalsServicePopupOpen(true)}
+            onClick={() => setApprovalsPopupOpen(true)}
             className="h-16 flex flex-col items-center justify-center bg-blue-600 hover:bg-blue-700"
           >
             <FileText className="w-5 h-5 mb-1" />
@@ -195,7 +175,7 @@ const Index = () => {
           </Button>
           
           <Button 
-            onClick={() => setLearningServicePopupOpen(true)}
+            onClick={() => setLearningPopupOpen(true)}
             className="h-16 flex flex-col items-center justify-center bg-orange-600 hover:bg-orange-700"
           >
             <BookOpen className="w-5 h-5 mb-1" />
@@ -203,38 +183,13 @@ const Index = () => {
           </Button>
         </div>
 
-        {/* Service Popups */}
-        <TeamsServicePopup 
-          isOpen={teamsServicePopupOpen}
-          onClose={() => setTeamsServicePopupOpen(false)}
-        />
-        
-        <OutlookServicePopup 
-          isOpen={outlookServicePopupOpen}
-          onClose={() => setOutlookServicePopupOpen(false)}
-        />
-        
-        <ServiceNowServicePopup 
-          isOpen={serviceNowServicePopupOpen}
-          onClose={() => setServiceNowServicePopupOpen(false)}
-        />
-        
-        <IncidentsServicePopup 
-          isOpen={incidentsServicePopupOpen}
-          onClose={() => setIncidentsServicePopupOpen(false)}
-        />
-        
-        <ApprovalsServicePopup 
-          isOpen={approvalsServicePopupOpen}
-          onClose={() => setApprovalsServicePopupOpen(false)}
-        />
-        
-        <LearningServicePopup 
-          isOpen={learningServicePopupOpen}
-          onClose={() => setLearningServicePopupOpen(false)}
+        {/* Dashboard Summary */}
+        <DashboardSummary 
+          dashboardData={dashboardData}
+          criticalCount={criticalCount}
         />
 
-        {/* Individual Data Popups */}
+        {/* Individual Popups */}
         <OutlookPopup 
           isOpen={outlookPopupOpen}
           onClose={() => setOutlookPopupOpen(false)}
